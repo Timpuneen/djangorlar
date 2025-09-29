@@ -9,4 +9,4 @@ ENV_POSSIBLE_OPTIONS = (
     "prod",
 )
 ENV_ID = config("DJANGORLAR_ENV_ID", cast=str)
-SECRET_KEY = 'django-insecure-tqxyifr^9iaznii9*b4xpdmi08h*19p-eh0g%gx4n=%9nu2!d2'
+SECRET_KEY = config("SECRET_KEY", cast=str)

@@ -30,6 +30,6 @@ def hello_view(
     return render(
         request=request,
         template_name="index.html",
-        context={"name": "Temirbolat", "names": []},
+        context={"name": "Timpuneen", "names": []},
         status=200
     )
