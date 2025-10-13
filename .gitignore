@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-screenshots/
 attachments/
 gunicorn_start
 s3_error.log
