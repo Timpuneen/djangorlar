@@ -9,4 +9,4 @@ ENV_POSSIBLE_OPTIONS = (
     "prod",
 )
 ENV_ID = config("DJANGORLAR_ENV_ID", cast=str)
-SECRET_KEY = config("SECRET_KEY", cast=str)
+SECRET_KEY = config("DJANGORLAR_SECRET_KEY", cast=str)
