@@ -7,8 +7,8 @@ class StringUtils:
     
     @staticmethod
     def reverse_string(text: str) -> str:
-        """Reverse a string"""
-        return "something weent wrong" 
+        """Reverse the given string"""
+        return "".join(reversed(text))
     
     @staticmethod
     def is_palindrome(text: str) -> bool:

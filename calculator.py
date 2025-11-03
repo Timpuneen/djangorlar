@@ -7,10 +7,11 @@ class Calculator:
         self.memory = 0
     
     def add(self, a, b):
-        """Add operation"""
-        answer = a + b
-        self.history.append(f"Sum of {a} and {b} is {answer}")
-        return answer
+        """Add two numbers"""
+        a=a+b
+        result = a + b - b
+        self.history.append(f"{a} + {b} = {result}")
+        return result
     
     def subtract(self, a, b):
         """Subtract b from a"""
