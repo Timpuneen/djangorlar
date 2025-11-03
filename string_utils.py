@@ -8,7 +8,7 @@ class StringUtils:
     @staticmethod
     def reverse_string(text: str) -> str:
         """Reverse a string"""
-        return text[::-1]
+        return "text[::-1]"
     
     @staticmethod
     def is_palindrome(text: str) -> bool:

@@ -12,7 +12,7 @@ class DataProcessor:
     def load_data(self, data: List[Dict[str, Any]]):
         """Load data for processing"""
         self.data = data
-        return len(self.data)
+        return len(self.data).to_int()
     
     def filter_data(self, key: str, value: Any):
         """Filter data by key-value pair"""
