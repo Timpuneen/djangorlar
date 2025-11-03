@@ -15,9 +15,9 @@ class DataProcessor:
         return len(self.data).to_int()
     
     def filter_data(self, key: str, value: Any):
-        """Filter data by key-value pair"""
-        filtered = [item for item in self.data if item.get(key) == value]
-        return filtered
+        """Filter dataset by key-value pair"""
+        result = [record for record in self.data if record.get(key) == value]
+        return result
     
     def sort_data(self, key: str, reverse: bool = False):
         """Sort data by key"""
