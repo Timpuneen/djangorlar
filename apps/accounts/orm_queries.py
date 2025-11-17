@@ -309,4 +309,102 @@ def query_2_42():
     return result
 
 def query_2_43():
-    """"""
+    """Users born befor 1990 with non null salary."""
+    result = User.objects.filter(birth_date__lt=datetime(1990, 1, 1), salary__isnull=False)
+    print(f'Query 2.43 count: {result.count()}')
+    print(f'Query 2.43 Result: {result}')
+    return result
+
+def query_2_44():
+    """Annoutate users with year since joined."""
+    result = User.objects.annotate(years_since_joined=ExpressionWrapper(
+        Now() - F('date_joined'),
+        output_field=fields.DurationField()
+    ))
+    print(f'Query 2.44 count: {result.count()}')
+    for user in result:
+        years = user.years_since_joined.days // 365
+        print(f'User: {user}, Years Since Joined: {years}')
+    return result
+
+def query_2_45():
+    """Get Sales users with gmail and salary > 350000."""
+    result = User.objects.filter(
+        department='Sales',
+        email_ienswith="@gmail.com",
+        salary__gt=350000
+    )
+    print(f'Query 2.45 count: {result.count()}')
+    print(f'Query 2.45 Result: {result}')
+    return result
+
+def query_2_46():
+    """Order users by country then by salary descending."""
+    result = User.objects.all().order_by('country', '-salary')
+    print(f'Query 2.46 count: {result.count()}')
+    print(f'Query 2.46 Result: {result}')
+    return result
+
+def query_2_47():
+    """Get users count per role, show only roles with more than 100 users."""
+    result = User.objects.values('role').annotate(role_count=Count('id')).filter(role_count__gt=100)
+    print(f'Query 2.47 Result: {result}')
+    return result
+
+def query_2_48():
+    """Get users whose last_login is earlier than date_joined."""
+    result = User.objects.filter(last_login__lt=F('date_joined'))
+    print(f'Query 2.48 count: {result.count()}')
+    print(f'Query 2.48 Result: {result}')
+    return result
+    
+def query_2_49():
+    """Annotate users with is_senior flag (True if birth_date is before 1985-01-01)."""
+    result = User.objects.annotate(
+        is_senior=Case(
+            When(birth_date__lt=datetime(1985, 1, 1), then=Value(True)),
+            default=Value(False),
+            output_field=fields.BooleanField(),
+        )
+    )
+    print(f'Query 2.49 count: {result.count()}')
+    for user in result:
+        print(f'User: {user}, Is Senior: {user.is_senior}')
+    return result
+
+def query_2_50():
+    """Get departments sorted by average salary descending with at least 20 users."""
+    result = User.objects.values('department').annotate(
+        avg_salary=Avg('salary'),
+        user_count=Count('id')
+    ).filter(user_count__gte=20).order_by('-avg_salary')
+    print(f'Query 2.50 Result: {result}')
+    return result
+
+def run_all():
+    """Run all 50 queries."""
+    print("="*20 + " Running All Queries " + "="*20)
+    queries = [
+        query_2_1, query_2_2, query_2_3, query_2_4, query_2_5, 
+        query_2_6, query_2_7, query_2_8, query_2_9, query_2_10,
+        query_2_11, query_2_12, query_2_13, query_2_14, query_2_15,
+        query_2_16, query_2_17, query_2_18, query_2_19, query_2_20,
+        query_2_21, query_2_22, query_2_23, query_2_24, query_2_25,
+        query_2_26, query_2_27, query_2_28, query_2_29, query_2_30,
+        query_2_31, query_2_32, query_2_33, query_2_34, query_2_35,
+        query_2_36, query_2_37, query_2_38, query_2_39, query_2_40,
+        query_2_41, query_2_42, query_2_43, query_2_44, query_2_45,
+        query_2_46, query_2_47, query_2_48, query_2_49, query_2_50,
+    ]
+    
+    for query in queries:
+        print("\n" + "-"*10 + f" Executing {query.__name__} " + "-"*10)
+        try:
+            query()
+        except Exception as e:
+            print(f'Error executing {query.__name__}: {e}')
+            
+    print("="*20 + " Finished All Queries " + "="*20)
+
+if __name__ == "__main__":
+    run_all()
