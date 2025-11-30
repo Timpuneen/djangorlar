@@ -25,6 +25,7 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_spectacular',
 ]
 PROJECT_APPS = [
     "apps.tasks.apps.TasksConfig",
@@ -105,6 +106,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',  
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # ----------------------------------------------
@@ -116,4 +118,12 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Practice 9-10 DRF API',
+    'DESCRIPTION': 'API documentation for Practice 9-10 DRF project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
 }

@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db import models
 from decimal import Decimal
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 
 from apps.education.models import Course, Lesson
 from apps.education.serializers import (
@@ -17,6 +18,44 @@ from apps.education.serializers import (
 )
 from apps.education.permissions import IsCourseOwner
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Courses",
+        description="Retrieve a list of all courses. Optionally filter by active status.",
+        parameters=[
+            OpenApiParameter(
+                name='is_active',
+                description='Filter courses by active status (true/false)',
+                required=False,
+                type=str,
+            ),
+        ],
+        responses={200: CourseListSerializer(many=True)},
+    ),
+    
+    create=extend_schema(
+        summary="Create Course",
+        description="Create a new course.",
+        request=CourseCreateUpdateSerializer,
+        responses={201: CourseCreateUpdateSerializer},
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve Course",
+        description="Retrieve details of a specific course by ID.",
+        responses={200: CourseDetailSerializer},
+    ),
+    update=extend_schema(
+        summary="Update Course",
+        description="Update an existing course. Only the owner can update.",
+        request=CourseCreateUpdateSerializer,
+        responses={200: CourseCreateUpdateSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete Course",
+        description="Soft delete a course. Only the owner can delete.",
+        responses={204: None},
+    ),
+)
 
 class CourseViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -80,6 +119,12 @@ class CourseViewSet(viewsets.ViewSet):
         course.soft_delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    
+    @extend_schema(
+        summary="Activate Course",
+        description="Activate a course. Only the owner can activate.",
+        responses={200: CourseDetailSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='activate')
     def activate(self, request, pk=None):
         course = get_object_or_404(Course, pk=pk)
@@ -102,6 +147,11 @@ class CourseViewSet(viewsets.ViewSet):
         serializer = CourseDetailSerializer(course)
         return Response(serializer.data)
     
+    @extend_schema(
+        summary="Deactivate Course",
+        description="Deactivate a course. Only the owner can deactivate.",
+        responses={200: CourseDetailSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='deactivate')
     def deactivate(self, request, pk=None):
         course = get_object_or_404(Course, pk=pk)
@@ -118,6 +168,11 @@ class CourseViewSet(viewsets.ViewSet):
         serializer = CourseDetailSerializer(course)
         return Response(serializer.data)
     
+    @extend_schema(
+        summary="List Lessons of Course",
+        description="Retrieve a list of lessons for a specific course.",
+        responses={200: LessonSerializer(many=True)},
+    )
     @action(detail=True, methods=['get'], url_path='lessons')
     def lessons(self, request, pk=None):
         course = get_object_or_404(Course, pk=pk)
@@ -126,6 +181,20 @@ class CourseViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+
+@extend_schema_view(
+    create = extend_schema(
+        summary="Create Lesson",
+        description="Create a new lesson within a course.",
+        request=LessonCreateSerializer,
+        responses={201: LessonCreateSerializer},
+    ),
+    destroy = extend_schema(
+        summary="Delete Lesson",
+        description="Soft delete a lesson. Only the course owner can delete.",
+        responses={204: None},
+    ),
+)
 class LessonViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     
@@ -154,6 +223,12 @@ class LessonViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        summary="Move Lesson",
+        description="Move a lesson to a new position within the course.",
+        request=LessonMoveSerializer,
+        responses={200: {'type': 'object', 'properties': {'order': {'type': 'number'}}}},
+    )
     @action(detail=True, methods=['put'], url_path='move')
     def move(self, request, pk=None):
         lesson = get_object_or_404(Lesson, pk=pk)
@@ -216,6 +291,11 @@ class LessonViewSet(viewsets.ViewSet):
         lesson.soft_delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    @extend_schema(
+        summary="Publish Lesson",
+        description="Publish a lesson. Only the course owner can publish.",
+        responses={200: LessonSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='publish')
     def publish(self, request, pk=None):
         lesson = get_object_or_404(Lesson, pk=pk)
@@ -232,6 +312,11 @@ class LessonViewSet(viewsets.ViewSet):
         serializer = LessonSerializer(lesson)
         return Response(serializer.data)
     
+    @extend_schema(
+        summary="Unpublish Lesson",
+        description="Unpublish a lesson. Only the course owner can unpublish.",
+        responses={200: LessonSerializer},
+    )
     @action(detail=True, methods=['post'], url_path='unpublish')
     def unpublish(self, request, pk=None):
         lesson = get_object_or_404(Lesson, pk=pk)
